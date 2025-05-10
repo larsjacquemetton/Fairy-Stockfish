@@ -388,6 +388,19 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
+      else if (token == "getavailablemoves") //Lars haxs
+        {
+            std::vector<Move> legalMoves;
+            for (Move m : MoveList<LEGAL>(pos))
+                legalMoves.push_back(m); 
+
+            for (const Move& m : legalMoves)
+            {
+                StateInfo newState;
+                pos.do_move(m, newState);
+                sync_cout << pos.fen() << sync_endl;
+            }
+        }
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
       else if (token == "export_net")
