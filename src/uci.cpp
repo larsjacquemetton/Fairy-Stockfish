@@ -42,6 +42,19 @@ extern vector<string> setup_bench(const Position&, istream&);
 
 namespace {
 
+  Square get_square(const std::string& square) {
+    if (square.length() != 2)
+        return SQ_NONE;
+
+    int file = square[0] - 'a';
+    int rank = square[1] - '1';
+
+    if (file < 0 || file > 7 || rank < 0 || rank > 7)
+        return SQ_NONE; 
+
+    return Square((rank * 8) + file); 
+    }
+
   // position() is called when engine receives the "position" UCI command.
   // The function sets up the position described in the given FEN string ("fen")
   // or the starting position ("startpos") and then makes the moves given in the
@@ -388,7 +401,7 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
-      else if (token == "getavailablemoves") //Lars haxs
+      else if (token == "getavailablemoves")
         {
             std::vector<Move> legalMoves;
             for (Move m : MoveList<LEGAL>(pos))
@@ -401,6 +414,29 @@ void UCI::loop(int argc, char* argv[]) {
                 sync_cout << pos.fen() << sync_endl;
             }
         }
+      else if (token == "getpiecemoves") 
+        {
+            sync_cout << "sanity check: " << sync_endl;
+            std::string square;  
+            std::cin >> square;  
+        
+            Square from_square = Square(get_square(square));  
+            
+            std::vector<Move> legalMoves;
+            for (Move m : MoveList<LEGAL>(pos))
+            {
+                if (from_square == from_sq(m)) // Filter moves for selected piece
+                    legalMoves.push_back(m);
+            }
+        
+            for (const Move& m : legalMoves)
+            {
+                StateInfo newState;
+                pos.do_move(m, newState);
+                sync_cout << pos.fen() << sync_endl;
+            }
+        }
+        
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
       else if (token == "export_net")
