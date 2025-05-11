@@ -435,6 +435,10 @@ void UCI::loop(int argc, char* argv[]) {
                 sync_cout << pos.fen() << sync_endl;
                 pos.undo_move(m);
             }
+            if(legalMoves.size()==0)
+            {
+                sync_cout << "emp" << sync_endl;
+            }
         }
         
         
