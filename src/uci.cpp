@@ -412,30 +412,31 @@ void UCI::loop(int argc, char* argv[]) {
                 StateInfo newState;
                 pos.do_move(m, newState);
                 sync_cout << pos.fen() << sync_endl;
+                pos.undo_move(m);
             }
         }
-      else if (token == "getpiecemoves") 
+        else if (token == "getpiecemoves") 
         {
-            sync_cout << "sanity check: " << sync_endl;
-            std::string square;  
-            std::cin >> square;  
+            std::string square;
+            is >> square;  // Extract piece position from the command
         
             Square from_square = Square(get_square(square));  
-            
+        
             std::vector<Move> legalMoves;
             for (Move m : MoveList<LEGAL>(pos))
             {
                 if (from_square == from_sq(m)) // Filter moves for selected piece
                     legalMoves.push_back(m);
             }
-        
             for (const Move& m : legalMoves)
             {
                 StateInfo newState;
                 pos.do_move(m, newState);
                 sync_cout << pos.fen() << sync_endl;
+                pos.undo_move(m);
             }
         }
+        
         
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
